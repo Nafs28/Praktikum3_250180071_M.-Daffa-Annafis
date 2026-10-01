@@ -30,7 +30,7 @@ Praktikum3_250180071_M. Daffa Annafis/
 │   └── style.css               # Styling Box Model, Flexbox product card, dan responsif
 ├── uploads/                    # Direktori penyimpanan berkas gambar produk
 │   └── .gitkeep
-├── index.php                   # Katalog produk (Read, Search GET, Filter Kategori, Pagination, Delete)
+├── main.php                    # Katalog produk (Read, Search GET, Filter Kategori, Pagination, Delete)
 ├── create.php                  # Form tambah produk & handler POST (Validasi Server-Side + PRG)
 ├── edit.php                    # Form update produk & handler POST (Validasi Server-Side + PRG)
 ├── delete.php                  # Handler hapus produk (Method POST + Proteksi CSRF Token + PRG)
