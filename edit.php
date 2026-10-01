@@ -1,14 +1,9 @@
 <?php
-/**
- * Update Product (Form Terisi Data & Handler dengan Validasi dan Pola PRG)
- * File: edit.php
- * Praktikum 3 - Pemrograman Web
- */
+
 
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/helpers.php';
 
-// Ambil ID produk dari parameter query
 $id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
 
 if ($id <= 0) {
@@ -17,7 +12,6 @@ if ($id <= 0) {
     exit;
 }
 
-// Ambil data produk saat ini dari database
 try {
     $stmt = $pdo->prepare("SELECT * FROM products WHERE id = :id");
     $stmt->execute([':id' => $id]);
@@ -32,16 +26,14 @@ try {
     die("Gagal memuat produk: " . htmlspecialchars($e->getMessage()));
 }
 
-// Tangani Pengiriman Form Update (Method POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 1. Validasi Token CSRF
+
     $csrf_token = $_POST['csrf_token'] ?? '';
     if (!verify_csrf_token($csrf_token)) {
         http_response_code(403);
         die("<h3>Akses Ditolak</h3><p>Token CSRF tidak valid atau sesi Anda telah berakhir.</p>");
     }
 
-    // 2. Ambil dan sanitasi input form
     $name = trim($_POST['name'] ?? '');
     $category = trim($_POST['category'] ?? '');
     $price = trim($_POST['price'] ?? '');
@@ -50,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $errors = [];
 
-    // 3. Validasi Server-Side
     if (mb_strlen($name) < 3) {
         $errors[] = "Nama produk harus diisi dan minimal 3 karakter.";
     }
@@ -67,8 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Silakan pilih salah satu kategori produk.";
     }
 
-    // Penanganan Penggantian Gambar (Fitur Bonus)
-    $image_filename = $product['image']; // Default tetap gambar lama
+    $image_filename = $product['image']; 
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
         $file = $_FILES['image'];
@@ -108,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // 4. Pola PRG Jika Ada Kesalahan Validasi
     if (!empty($errors)) {
         set_old_input([
             'name' => $name,
@@ -122,7 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // 5. Eksekusi UPDATE dengan PDO Prepared Statement
     try {
         $sql = "UPDATE products 
                 SET name = :name, 
@@ -145,7 +133,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         clear_old_input();
 
-        // 6. Pola PRG: Redirect ke index.php dengan Flash Message Sukses
         set_flash('success', "Data produk \"{$name}\" berhasil diperbarui!");
         header("Location: index.php");
         exit;
@@ -157,12 +144,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Render Tampilan Form Edit (Method GET)
 $page_title = "Edit Merchandise F1 - " . $product['name'];
 require_once __DIR__ . '/includes/header.php';
 $categories = get_product_categories();
 
-// Helper untuk mengisi nilai awal (utamakan old input jika sebelumnya gagal validasi)
 $val_name = old('name', $product['name']);
 $val_category = old('category', $product['category']);
 $val_price = old('price', $product['price']);
@@ -180,7 +165,7 @@ $val_description = old('description', $product['description']);
 
 <div class="form-card">
     <form action="edit.php?id=<?= (int)$product['id'] ?>" method="POST" enctype="multipart/form-data">
-        <!-- Token CSRF & Hidden ID -->
+    
         <?= csrf_field() ?>
         <input type="hidden" name="id" value="<?= (int)$product['id'] ?>">
 
